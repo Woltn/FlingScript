@@ -172,7 +172,7 @@ do
     TextLabel.BorderSizePixel = 0
     TextLabel.Size = UDim2.new(0,218,0,22)
     TextLabel.Font = Enum.Font.SourceSans
-    TextLabel.Text = "FE Fling Gui By Rip_IKASI"
+    TextLabel.Text = "Fling Script Created By Woltn"
     TextLabel.TextColor3 = Color3.fromRGB(255,255,255)
     TextLabel.TextSize = 14
 
