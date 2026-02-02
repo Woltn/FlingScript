@@ -1,0 +1,180 @@
+do
+    local lp = game:GetService("Players").LocalPlayer
+
+    local function gplr(String)
+        local Found = {}
+        local strl = String:lower()
+
+        if strl == "all" then
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                table.insert(Found, v)
+            end
+        elseif strl == "others" then
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v.Name ~= lp.Name then
+                    table.insert(Found, v)
+                end
+            end
+        elseif strl == "me" then
+            table.insert(Found, lp)
+        else
+            for _, v in pairs(game:GetService("Players"):GetPlayers()) do
+                if v.Name:lower():sub(1, #String) == strl
+                or v.DisplayName:lower():sub(1, #String) == strl then
+                    table.insert(Found, v)
+                end
+            end
+        end
+
+        return Found
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    local Frame = Instance.new("Frame")
+    local TextBox = Instance.new("TextBox")
+    local UICorner = Instance.new("UICorner")
+    local TextButton = Instance.new("TextButton")
+    local UICorner_2 = Instance.new("UICorner")
+    local UICorner_3 = Instance.new("UICorner")
+    local TextButton_2 = Instance.new("TextButton")
+    local UICorner_4 = Instance.new("UICorner")
+    local TextLabel = Instance.new("TextLabel")
+    local UICorner_5 = Instance.new("UICorner")
+
+    ScreenGui.Parent = lp:WaitForChild("PlayerGui")
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.ResetOnSpawn = false
+
+    Frame.Parent = ScreenGui
+    Frame.BackgroundColor3 = Color3.fromRGB(24,24,27)
+    Frame.BorderSizePixel = 0
+    Frame.Position = UDim2.new(0.697777748,0,0.373115569,0)
+    Frame.Size = UDim2.new(0,218,0,171)
+    Frame.Active = true
+    Frame.Visible = true
+    Frame.Draggable = true
+
+    TextBox.Parent = Frame
+    TextBox.BackgroundColor3 = Color3.fromRGB(24,24,33)
+    TextBox.BorderSizePixel = 0
+    TextBox.Position = UDim2.new(0.0412844047,0,0.146346062,0)
+    TextBox.Size = UDim2.new(0,200,0,50)
+    TextBox.Font = Enum.Font.SourceSans
+    TextBox.Text = ""
+    TextBox.TextColor3 = Color3.fromRGB(255,255,255)
+    TextBox.TextSize = 14
+
+    UICorner.Parent = TextBox
+
+    TextButton.Parent = Frame
+    TextButton.BackgroundColor3 = Color3.fromRGB(24,24,33)
+    TextButton.BorderSizePixel = 0
+    TextButton.Position = UDim2.new(0.0412844047,0,0.491292328,0)
+    TextButton.Size = UDim2.new(0,200,0,32)
+    TextButton.Font = Enum.Font.SourceSans
+    TextButton.Text = "Fling"
+    TextButton.TextColor3 = Color3.fromRGB(255,255,255)
+    TextButton.TextSize = 14
+
+    TextButton.MouseButton1Down:Connect(function()
+        local Targets = {TextBox.Text}
+        local Players = game:GetService("Players")
+        local Player = Players.LocalPlayer
+        local AllBool = false
+
+        local function GetPlayer(Name)
+            Name = Name:lower()
+
+            if Name == "all" or Name == "others" then
+                AllBool = true
+                return
+            elseif Name == "random" then
+                local GetPlayers = Players:GetPlayers()
+                table.remove(GetPlayers, table.find(GetPlayers, Player))
+                return GetPlayers[math.random(#GetPlayers)]
+            else
+                for _, x in next, Players:GetPlayers() do
+                    if x ~= Player then
+                        if x.Name:lower():match("^" .. Name)
+                        or x.DisplayName:lower():match("^" .. Name) then
+                            return x
+                        end
+                    end
+                end
+            end
+        end
+
+        local function Message(t, txt, d)
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = t,
+                Text = txt,
+                Duration = d
+            })
+        end
+
+        local function SkidFling(TargetPlayer)
+            local Character = Player.Character
+            local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = Humanoid and Humanoid.RootPart
+            local TCharacter = TargetPlayer.Character
+            local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+            local TRootPart = THumanoid and THumanoid.RootPart
+            local THead = TCharacter and TCharacter:FindFirstChild("Head")
+
+            if not (Character and Humanoid and RootPart and THumanoid) then return end
+
+            if RootPart.Velocity.Magnitude < 50 then
+                getgenv().OldPos = RootPart.CFrame
+            end
+
+            workspace.CurrentCamera.CameraSubject = THead or TRootPart or THumanoid
+
+            local BV = Instance.new("BodyVelocity", RootPart)
+            BV.Velocity = Vector3.new(9e7,9e7,9e7)
+            BV.MaxForce = Vector3.new(1/0,1/0,1/0)
+
+            repeat
+                RootPart.CFrame = TRootPart.CFrame * CFrame.new(0,1.5,0)
+                task.wait()
+            until Humanoid.Health <= 0
+                or not TargetPlayer.Character
+
+            BV:Destroy()
+            workspace.CurrentCamera.CameraSubject = Humanoid
+            RootPart.CFrame = getgenv().OldPos
+        end
+
+        for _, x in pairs(Targets) do
+            local plr = GetPlayer(x)
+            if plr and plr ~= Player then
+                SkidFling(plr)
+            end
+        end
+    end)
+
+    UICorner_2.Parent = TextButton
+    UICorner_3.Parent = Frame
+
+    TextButton_2.Parent = Frame
+    TextButton_2.BackgroundColor3 = Color3.fromRGB(24,24,33)
+    TextButton_2.BorderSizePixel = 0
+    TextButton_2.Position = UDim2.new(0.0412844047,0,0.737784028,0)
+    TextButton_2.Size = UDim2.new(0,200,0,28)
+    TextButton_2.Font = Enum.Font.SourceSans
+    TextButton_2.Text = "Fling v1"
+    TextButton_2.TextColor3 = Color3.fromRGB(255,255,255)
+    TextButton_2.TextSize = 14
+
+    UICorner_4.Parent = TextButton_2
+
+    TextLabel.Parent = Frame
+    TextLabel.BackgroundColor3 = Color3.fromRGB(24,24,35)
+    TextLabel.BorderSizePixel = 0
+    TextLabel.Size = UDim2.new(0,218,0,22)
+    TextLabel.Font = Enum.Font.SourceSans
+    TextLabel.Text = "Fling Script Created By Woltn"
+    TextLabel.TextColor3 = Color3.fromRGB(255,255,255)
+    TextLabel.TextSize = 14
+
+    UICorner_5.Parent = TextLabel
+end
